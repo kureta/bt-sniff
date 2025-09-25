@@ -1,0 +1,22 @@
+[build-system]
+build-backend = "hatchling.build"
+requires = [ "hatchling" ]
+
+[project]
+name = "bt-sniff"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+classifiers = [ "Programming Language :: Python :: 3 :: Only", "Programming Language :: Python :: 3.13" ]
+dependencies = [
+  "bleak>=1.1.1",
+  "bluepy>=1.3",
+  "dbus-next>=0.2.3",
+  "pygatt[gatttool]>=5",
+  "typer>=0.19.2",
+]
+scripts.bt-sniff = "bt_sniff:main.app"
+
+[tool.hatch.build.targets.wheel]
+packages = [ "src/bt_sniff" ]
