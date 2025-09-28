@@ -105,7 +105,7 @@ app = typer.Typer(
 
 @app.command()
 def listen_all(
-    address: Annotated[str, typer.Option(help="Address of the bluetooth device")],
+    address: Annotated[str, typer.Argument(help="Address of the bluetooth device")],
 ):
     """
     Listen to all incoming messages from a given device.
