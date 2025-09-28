@@ -8,7 +8,6 @@ import tkinter as tk
 from bleak import BleakClient
 from pythonosc import udp_client
 
-ADDRESS = "6D:F8:90:4D:C3:55"
 START_UUID = "0000a011-5761-7665-7341-7564696f4c74"
 STREAM_UUID = "0000a015-5761-7665-7341-7564696f4c74"
 
@@ -24,10 +23,10 @@ def parse_packet(data: bytes):
 
 
 class BleakRunner(threading.Thread):
-    def __init__(self, update_cb):
+    def __init__(self, update_cb, address):
         super().__init__(daemon=True)
         self.loop = asyncio.new_event_loop()
-        self.client = BleakClient(ADDRESS, loop=self.loop)
+        self.client = BleakClient(address, loop=self.loop)
         self._update = update_cb
         self._running = False
 
@@ -82,7 +81,7 @@ class BleakRunner(threading.Thread):
 
 
 class Window(tk.Tk):
-    def __init__(self):
+    def __init__(self, address):
         super().__init__()
         self.title("BLE→OSC Quaternion")
         self.protocol("WM_DELETE_WINDOW", self.on_close)
@@ -93,7 +92,7 @@ class Window(tk.Tk):
         self.btn = tk.Button(self, text="Start", command=self.toggle_stream)
         self.btn.pack(padx=20, pady=5)
 
-        self.ble = BleakRunner(self.update_quat)
+        self.ble = BleakRunner(self.update_quat, address)
         self.ble.start()
 
         self._streaming = False
@@ -116,7 +115,3 @@ class Window(tk.Tk):
     def on_close(self):
         self.ble.shutdown()
         self.destroy()
-
-
-if __name__ == "__main__":
-    Window().mainloop()
