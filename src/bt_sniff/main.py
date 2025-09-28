@@ -137,7 +137,9 @@ def listen(
 
 @app.command()
 def tracker(
-    address: Annotated[str, typer.Argument(help="Address of the bluetooth device")],
+    address: Annotated[
+        str, typer.Argument(help="Address of the bluetooth device")
+    ] = "",
 ):
     """
     Stream tracker data os osc messages.

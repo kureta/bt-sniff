@@ -5,7 +5,7 @@ import struct
 import threading
 import tkinter as tk
 
-from bleak import BleakClient
+from bleak import BleakClient, BleakScanner
 from pythonosc import udp_client
 
 START_UUID = "0000a011-5761-7665-7341-7564696f4c74"
@@ -22,13 +22,27 @@ def parse_packet(data: bytes):
     return [q0 / scale, q1 / scale, q2 / scale, q3 / scale]
 
 
+async def get_nx_tracker():
+    scanner = BleakScanner()
+    devices = await scanner.discover()
+    # get matching devices
+    nxs = [dev for dev in devices if dev.name == "Nx Tracker 2"]
+    if len(nxs) == 0:
+        raise RuntimeError("No Nx Tracker 2 devices were found!")
+    elif n := len(nxs) > 1:
+        print(f"WARNING: Multiple Nx Tracker devices were found! ({n=})")
+    else:
+        return nxs[0]
+
+
 class BleakRunner(threading.Thread):
     def __init__(self, update_cb, address):
         super().__init__(daemon=True)
         self.loop = asyncio.new_event_loop()
-        self.client = BleakClient(address, loop=self.loop)
+        self.address = address
         self._update = update_cb
         self._running = False
+        self.client: BleakClient | None = None
 
         # set up your OSC client once, reuse on every packet
         self.osc_client = udp_client.SimpleUDPClient(OSC_IP, OSC_PORT)
@@ -43,6 +57,9 @@ class BleakRunner(threading.Thread):
         self._running = True
 
         async def _go():
+            if not self.address:
+                self.address = await get_nx_tracker()
+            self.client = BleakClient(self.address, loop=self.loop)
             await self.client.connect()
             # tell device “start streaming”
             await self.client.write_gatt_char(START_UUID, b"\xff")
