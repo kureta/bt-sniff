@@ -7,6 +7,8 @@ from dbus_next.aio.message_bus import MessageBus
 from dbus_next.constants import BusType
 from typing_extensions import Annotated
 
+from bt_sniff.tracker import Window
+
 # bluetooth namespace in dbus
 BUS_NAME = "org.bluez"
 # this machines bluetooth adapter
@@ -131,3 +133,11 @@ def listen(
     Listen to a specific service and handler on a device.
     """
     asyncio.run(_listen_service_char(address, service, handle))
+
+
+@app.command()
+def tracker():
+    """
+    Stream tracker data os osc messages.
+    """
+    Window().mainloop()

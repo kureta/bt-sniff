@@ -81,7 +81,7 @@ class BleakRunner(threading.Thread):
         self.loop.call_soon_threadsafe(self.loop.stop)
 
 
-class App(tk.Tk):
+class Window(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("BLE→OSC Quaternion")
@@ -119,4 +119,4 @@ class App(tk.Tk):
 
 
 if __name__ == "__main__":
-    App().mainloop()
+    Window().mainloop()
